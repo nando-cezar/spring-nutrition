@@ -30,6 +30,12 @@ public class TipService {
         return tipRepository.findById(id).map(TipResponseDto::new);
     }
 
+    public TipResponseDto update(Long id, TipRequestDto entity){
+        var data = entity.toEntity();
+        data.setId(id);
+        return TipResponseDto.toDto(tipRepository.save(data));
+    }
+
     public void deleteById(Long id){
         tipRepository.deleteById(id);
     }

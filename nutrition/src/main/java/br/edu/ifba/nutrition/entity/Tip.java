@@ -10,7 +10,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,8 +29,11 @@ public class Tip {
     private String text;
     @Enumerated(EnumType.STRING)
     private Category category;
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "tip_id")
+    @OneToMany(
+        cascade = CascadeType.ALL, 
+        mappedBy="tip",
+        orphanRemoval = true
+    )
     private List<Comment> comments;
 
     public Tip(String title, String photo, String text, Category category, List<Comment> comments) {

@@ -15,5 +15,9 @@ public record CommentResponseDto(Long id, LocalDateTime dateTime, String text, U
     public static List<CommentResponseDto> toListDto(List<Comment> list) {
         return list.stream().map(CommentResponseDto::new).collect(Collectors.toList());
     }
+
+    public static CommentResponseDto toDto(Comment data) {
+        return new CommentResponseDto(data);
+    }
     
 }

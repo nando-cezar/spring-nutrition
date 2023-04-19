@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,6 +47,15 @@ public class TipController {
             .map(record -> ResponseEntity.ok().body(record))
             .orElse(ResponseEntity.notFound().build());
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TipResponseDto> update(@PathVariable Long id, @RequestBody TipRequestDto data){
+        return tipService.findById(id)
+        .map(record -> {
+            var dataSaved = tipService.update(id, data);
+            return ResponseEntity.ok().body(dataSaved);
+        }).orElse(ResponseEntity.notFound().build());
+    } 
     
     @DeleteMapping("/{id}")
     public ResponseEntity<TipResponseDto> deleteById(@PathVariable Long id){
