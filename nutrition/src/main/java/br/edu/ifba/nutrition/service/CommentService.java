@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 
 import br.edu.ifba.nutrition.domain.dto.request.CommentRequestDto;
 import br.edu.ifba.nutrition.domain.dto.response.CommentResponseDto;
+import br.edu.ifba.nutrition.entity.Comment;
 import br.edu.ifba.nutrition.repository.CommentRepository;
+import br.edu.ifba.nutrition.repository.TipRepository;
+import br.edu.ifba.nutrition.repository.UserRepository;
 
 @Service
 public class CommentService {
@@ -16,9 +19,15 @@ public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
-    public CommentResponseDto save(CommentRequestDto data){
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TipRepository tipRepository;
+
+    public Optional<CommentResponseDto> save(CommentRequestDto data){
         var dataEntity = data.toEntity();
-        return CommentResponseDto.toDto(commentRepository.save(dataEntity)) ;
+        return this.persist(data, dataEntity);
     }
 
     public Optional<List<CommentResponseDto>> findByTipId(Long id){
@@ -33,13 +42,27 @@ public class CommentService {
         return commentRepository.findById(id).map(CommentResponseDto::new);
     }
 
-    public CommentResponseDto update(Long id, CommentRequestDto entity){
-        var data = entity.toEntity();
-        data.setId(id);
-        return CommentResponseDto.toDto(commentRepository.save(data));
+    public Optional<CommentResponseDto> update(Long id, CommentRequestDto data){
+        var dataEntity = data.toEntity();
+        dataEntity.setId(id);
+        return this.persist(data, dataEntity);
     }
 
     public void deleteById(Long id){
         commentRepository.deleteById(id);
     }
+
+    private Optional<CommentResponseDto> persist(CommentRequestDto data, Comment dataEntity){
+
+        var userData = userRepository.findById(data.userId()).map(record -> record);
+        var tipData = tipRepository.findById(data.tipId()).map(record -> record);
+        
+        if(userData.isPresent() && tipData.isPresent()){
+            dataEntity.setUser(userData.get());
+            dataEntity.setTip(tipData.get());
+            return Optional.of(CommentResponseDto.toDto(commentRepository.save(dataEntity)));
+        }
+        return Optional.empty();
+    }
+
 }

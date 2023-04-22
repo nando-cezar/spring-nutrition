@@ -37,10 +37,9 @@ public class Comment {
     @JoinColumn(name="tip_id")
     private Tip tip;
     
-    public Comment(LocalDateTime dateTime, String text, User user) {
+    public Comment(LocalDateTime dateTime, String text) {
         this.dateTime = dateTime;
         this.text = text;
-        this.user = user;
     }
     
 }

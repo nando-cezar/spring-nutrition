@@ -19,5 +19,14 @@ public record TipResponseDto(Long id, String title, String photo, String text, C
     public static TipResponseDto toDto(Tip data) {
         return new TipResponseDto(data);
     }
+
+    public Tip toEntity(){
+        return new Tip(
+            id,
+            title, 
+            photo, 
+            text, 
+            category, null);
+    }
     
 }

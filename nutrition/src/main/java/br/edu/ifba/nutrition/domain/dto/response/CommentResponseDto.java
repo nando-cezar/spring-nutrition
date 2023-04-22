@@ -19,5 +19,5 @@ public record CommentResponseDto(Long id, LocalDateTime dateTime, String text, U
     public static CommentResponseDto toDto(Comment data) {
         return new CommentResponseDto(data);
     }
-    
+
 }

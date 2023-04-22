@@ -1,7 +1,5 @@
 package br.edu.ifba.nutrition.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,12 +10,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.edu.ifba.nutrition.domain.dto.request.TipRequestDto;
-import br.edu.ifba.nutrition.domain.dto.response.TipResponseDto;
-import br.edu.ifba.nutrition.service.TipService;
+import br.edu.ifba.nutrition.domain.dto.request.UserRequestDto;
+import br.edu.ifba.nutrition.domain.dto.response.UserResponseDto;
+import br.edu.ifba.nutrition.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,15 +25,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 
 @RestController
-@RequestMapping(path = "/tips")
-@Tag(name = "Tips")
-public class TipController {
+@RequestMapping(path = "/users")
+@Tag(name = "Users")
+public class UserController {
     
     @Autowired
-    private TipService tipService;
+    private UserService userService;
 
     @PostMapping
-    @Operation(summary = "Save only one tip")
+    @Operation(summary = "Save only one user")
     @ApiResponses(
         value = {
             @ApiResponse(
@@ -45,7 +42,7 @@ public class TipController {
                 content = {
                     @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = TipResponseDto.class)
+                        schema = @Schema(implementation = UserResponseDto.class)
                     )
                 }    
             ),
@@ -55,53 +52,19 @@ public class TipController {
                 content = {
                     @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = TipResponseDto.class)
+                        schema = @Schema(implementation = UserResponseDto.class)
                     )
                 }    
             )
         }
     )
-    public ResponseEntity<TipResponseDto> save(@Parameter(description = "New tip body content to be created") @RequestBody TipRequestDto data){
-        var dataDto = tipService.save(data);
-        return new ResponseEntity<TipResponseDto>(dataDto, HttpStatus.CREATED);
-    } 
-
-    @GetMapping
-    @Operation(summary = "Retrieve all hints with or without filter")
-    @ApiResponses(
-        value = {
-            @ApiResponse(
-                responseCode = "200", 
-                description = "Retrieval of successful hints", 
-                content = {
-                    @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(implementation = TipResponseDto.class)
-                    )
-                }    
-            ),
-            @ApiResponse(
-                responseCode = "404", 
-                description = "Not found", 
-                content = {
-                    @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(implementation = TipResponseDto.class)
-                    )
-                }    
-            )
-        }
-    )
-    public ResponseEntity<List<TipResponseDto>> find(@Parameter(description = "Title for tip to be found (optional)") @RequestParam(required = false) String title){
-        var data = tipService.find(title).get();
-        var isEmpty = data.isEmpty();     
-        return isEmpty ? 
-            ResponseEntity.notFound().build() : 
-            ResponseEntity.ok().body(data);
+    public ResponseEntity<UserResponseDto> save(@Parameter(description = "New user body content to be created") @RequestBody UserRequestDto data){
+        var dataDto = userService.save(data);
+        return new ResponseEntity<UserResponseDto>(dataDto, HttpStatus.CREATED);
     } 
 
     @GetMapping("/{id}")
-    @Operation(summary = "Retrieve tip by id")
+    @Operation(summary = "Retrieve user by id")
     @ApiResponses(
         value = {
             @ApiResponse(
@@ -110,7 +73,7 @@ public class TipController {
                 content = {
                     @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = TipResponseDto.class)
+                        schema = @Schema(implementation = UserResponseDto.class)
                     )
                 }    
             ),
@@ -120,21 +83,21 @@ public class TipController {
                 content = {
                     @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = TipResponseDto.class)
+                        schema = @Schema(implementation = UserResponseDto.class)
                     )
                 }    
             )
         }
     )
-    public ResponseEntity<TipResponseDto> findById(@Parameter(description = "Tip Id to be searched") @PathVariable Long id){
-        return tipService.findById(id)
+    public ResponseEntity<UserResponseDto> findById(@Parameter(description = "User Id to be searched") @PathVariable Long id){
+        return userService.findById(id)
             .map(record -> ResponseEntity.ok().body(record))
             .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     @Transactional
-    @Operation(summary = "Update only one tip")
+    @Operation(summary = "Update only one user")
     @ApiResponses(
         value = {
             @ApiResponse(
@@ -143,7 +106,7 @@ public class TipController {
                 content = {
                     @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = TipResponseDto.class)
+                        schema = @Schema(implementation = UserResponseDto.class)
                     )
                 }    
             ),
@@ -153,23 +116,23 @@ public class TipController {
                 content = {
                     @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = TipResponseDto.class)
+                        schema = @Schema(implementation = UserResponseDto.class)
                     )
                 }    
             )
         }
     )
-    public ResponseEntity<TipResponseDto> update(@Parameter(description = "Tip Id to be updated") @PathVariable Long id, @Parameter(description = "Tip Elements/Body Content to be updated") @RequestBody TipRequestDto data){
-        return tipService.findById(id)
+    public ResponseEntity<UserResponseDto> update(@Parameter(description = "User Id to be updated") @PathVariable Long id, @Parameter(description = "User Elements/Body Content to be updated") @RequestBody UserRequestDto data){
+        return userService.findById(id)
         .map(record -> {
-            var dataSaved = tipService.update(id, data);
+            var dataSaved = userService.update(id, data);
             return ResponseEntity.ok().body(dataSaved);
         }).orElse(ResponseEntity.notFound().build());
     } 
     
     @DeleteMapping("/{id}")
     @Transactional
-    @Operation(summary = "Delete only one tip")
+    @Operation(summary = "Delete only one user")
     @ApiResponses(
         value = {
             @ApiResponse(
@@ -178,7 +141,7 @@ public class TipController {
                 content = {
                     @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = TipResponseDto.class)
+                        schema = @Schema(implementation = UserResponseDto.class)
                     )
                 }    
             ),
@@ -188,16 +151,16 @@ public class TipController {
                 content = {
                     @Content(
                         mediaType = "application/json",
-                        schema = @Schema(implementation = TipResponseDto.class)
+                        schema = @Schema(implementation = UserResponseDto.class)
                     )
                 }    
             )
         }
     )
-    public ResponseEntity<TipResponseDto> deleteById(@Parameter(description = "Tip Id to be deleted") @PathVariable Long id){
-        return tipService.findById(id)
+    public ResponseEntity<UserResponseDto> deleteById(@Parameter(description = "User Id to be deleted") @PathVariable Long id){
+        return userService.findById(id)
             .map(record -> {
-                tipService.deleteById(id);
+                userService.deleteById(id);
                 return ResponseEntity.ok().body(record);
             }).orElse(ResponseEntity.notFound().build());
     }
