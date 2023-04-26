@@ -2,7 +2,7 @@ package br.edu.ifba.nutrition.entity;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.CascadeType;
+//import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,10 +27,14 @@ public class Comment {
     @Column(name = "date_time")
     private LocalDateTime dateTime;
     private String text;
-    @ManyToOne(cascade = {
-        CascadeType.PERSIST,
-        CascadeType.MERGE
-    })
+    @ManyToOne
+    /*
+      - It is useful when persisting and updating comment data via request.
+        (cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+        })
+    */
     @JoinColumn(name="user_id")
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,6 +44,13 @@ public class Comment {
     public Comment(LocalDateTime dateTime, String text) {
         this.dateTime = dateTime;
         this.text = text;
+    }
+
+    public Comment(Long id, LocalDateTime dateTime, String text, User user) {
+        this.id = id;
+        this.dateTime = dateTime;
+        this.text = text;
+        this.user = user;
     }
     
 }

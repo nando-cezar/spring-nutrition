@@ -20,4 +20,5 @@ public record CommentResponseDto(Long id, LocalDateTime dateTime, String text, U
         return new CommentResponseDto(data);
     }
 
+    public Comment toEntity() { return new Comment(id, dateTime, text, user.toEntity()); }
 }

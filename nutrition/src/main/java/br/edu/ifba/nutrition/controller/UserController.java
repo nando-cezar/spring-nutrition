@@ -60,7 +60,7 @@ public class UserController {
     )
     public ResponseEntity<UserResponseDto> save(@Parameter(description = "New user body content to be created") @RequestBody UserRequestDto data){
         var dataDto = userService.save(data);
-        return new ResponseEntity<UserResponseDto>(dataDto, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dataDto);
     } 
 
     @GetMapping("/{id}")

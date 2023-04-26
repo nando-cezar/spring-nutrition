@@ -30,7 +30,7 @@ public class Tip {
     @Enumerated(EnumType.STRING)
     private Category category;
     @OneToMany(
-        cascade = CascadeType.ALL, 
+        cascade = CascadeType.REMOVE,
         mappedBy="tip",
         orphanRemoval = true
     )
