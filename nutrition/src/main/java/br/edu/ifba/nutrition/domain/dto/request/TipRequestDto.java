@@ -6,7 +6,7 @@ import br.edu.ifba.nutrition.domain.enums.Category;
 import br.edu.ifba.nutrition.entity.Comment;
 import br.edu.ifba.nutrition.entity.Tip;
 
-public record TipRequestDto(Long id, String title, String photo, String text, Category category) {
+public record TipRequestDto(String title, String photo, String text, Category category) {
     
     public Tip toEntity(){
         return new Tip(

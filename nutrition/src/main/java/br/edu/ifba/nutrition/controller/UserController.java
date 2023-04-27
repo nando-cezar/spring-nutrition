@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -58,9 +59,15 @@ public class UserController {
             )
         }
     )
-    public ResponseEntity<UserResponseDto> save(@Parameter(description = "New user body content to be created") @RequestBody UserRequestDto data){
-        var dataDto = userService.save(data);
-        return ResponseEntity.status(HttpStatus.CREATED).body(dataDto);
+    public ResponseEntity<UserResponseDto> save(
+            @Parameter(description = "New user body content to be created")
+            @RequestBody UserRequestDto data,
+            UriComponentsBuilder builder
+    ){
+
+        var dataSaved = userService.save(data);
+        var uri = builder.path("/users/{id}").buildAndExpand(dataSaved.id()).toUri();
+        return ResponseEntity.created(uri).body(dataSaved);
     } 
 
     @GetMapping("/{id}")
@@ -89,7 +96,10 @@ public class UserController {
             )
         }
     )
-    public ResponseEntity<UserResponseDto> findById(@Parameter(description = "User Id to be searched") @PathVariable Long id){
+    public ResponseEntity<UserResponseDto> findById(
+            @Parameter(description = "User Id to be searched")
+            @PathVariable Long id
+    ){
         return userService.findById(id)
             .map(record -> ResponseEntity.ok().body(record))
             .orElse(ResponseEntity.notFound().build());
@@ -122,7 +132,12 @@ public class UserController {
             )
         }
     )
-    public ResponseEntity<UserResponseDto> update(@Parameter(description = "User Id to be updated") @PathVariable Long id, @Parameter(description = "User Elements/Body Content to be updated") @RequestBody UserRequestDto data){
+    public ResponseEntity<UserResponseDto> update(
+            @Parameter(description = "User Id to be updated")
+            @PathVariable Long id,
+            @Parameter(description = "User Elements/Body Content to be updated")
+            @RequestBody UserRequestDto data
+    ){
         return userService.findById(id)
         .map(record -> {
             var dataSaved = userService.update(id, data);
@@ -157,7 +172,10 @@ public class UserController {
             )
         }
     )
-    public ResponseEntity<UserResponseDto> deleteById(@Parameter(description = "User Id to be deleted") @PathVariable Long id){
+    public ResponseEntity<UserResponseDto> deleteById(
+            @Parameter(description = "User Id to be deleted")
+            @PathVariable Long id
+    ){
         return userService.findById(id)
             .map(record -> {
                 userService.deleteById(id);

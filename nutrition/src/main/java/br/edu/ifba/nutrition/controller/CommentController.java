@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping(path = "/comments")
@@ -60,10 +61,16 @@ public class CommentController {
             )
         }
     )
-    public ResponseEntity<CommentResponseDto> save(@Parameter(description = "New comment body content to be created")@RequestBody CommentRequestDto data){
+    public ResponseEntity<CommentResponseDto> save(
+            @Parameter(description = "New comment body content to be created")
+            @RequestBody CommentRequestDto data,
+            UriComponentsBuilder builder){
+
         return commentService.save(data)
-            .map(record -> ResponseEntity.ok().body(record))
-            .orElse(ResponseEntity.badRequest().build());
+            .map(record -> {
+                var uri = builder.path("/comments/{id}").buildAndExpand(record.id()).toUri();
+                return ResponseEntity.created(uri).body(record);
+            }).orElse(ResponseEntity.badRequest().build());
     } 
 
     @GetMapping("/tip")
@@ -92,7 +99,10 @@ public class CommentController {
             )
         }
     )
-    public ResponseEntity<List<CommentResponseDto>> findByTidId(@Parameter(description = "Tip Id to be searched") @RequestParam(required = false) Long tipId){
+    public ResponseEntity<List<CommentResponseDto>> findByTidId(
+            @Parameter(description = "Tip Id to be searched")
+            @RequestParam(required = false) Long tipId
+    ){
         var data = commentService.findByTipId(tipId).get();
         var isEmpty = data.isEmpty();     
         return isEmpty ? 
@@ -126,7 +136,10 @@ public class CommentController {
             )
         }
     )
-    public ResponseEntity<List<CommentResponseDto>> findByUserId(@Parameter(description = "User Id to be searched") @RequestParam(required = false) Long userId){
+    public ResponseEntity<List<CommentResponseDto>> findByUserId(
+            @Parameter(description = "User Id to be searched")
+            @RequestParam(required = false) Long userId
+    ){
         var data = commentService.findByUserId(userId).get();
         var isEmpty = data.isEmpty();     
         return isEmpty ? 
@@ -160,7 +173,10 @@ public class CommentController {
             )
         }
     )
-    public ResponseEntity<CommentResponseDto> findById(@Parameter(description = "Comment Id to be searched") @PathVariable Long id){
+    public ResponseEntity<CommentResponseDto> findById(
+            @Parameter(description = "Comment Id to be searched")
+            @PathVariable Long id
+    ){
         return commentService.findById(id)
             .map(record -> ResponseEntity.ok().body(record))
             .orElse(ResponseEntity.notFound().build());
@@ -193,7 +209,12 @@ public class CommentController {
             )
         }
     )
-    public ResponseEntity<CommentResponseDto> update(@Parameter(description = "Comment Id to be updated") @PathVariable Long id, @Parameter(description = "Comment Elements/Body Content to be updated") @RequestBody CommentRequestDto data){
+    public ResponseEntity<CommentResponseDto> update(
+            @Parameter(description = "Comment Id to be updated")
+            @PathVariable Long id,
+            @Parameter(description = "Comment Elements/Body Content to be updated")
+            @RequestBody CommentRequestDto data
+    ){
         return commentService.findById(id)
             .map(record -> {
                 var dataSaved = commentService.update(id, data).orElseThrow(() -> new IllegalStateException("Operation to find user and hint failed."));
@@ -228,7 +249,10 @@ public class CommentController {
             )
         }
     )
-    public ResponseEntity<CommentResponseDto> deleteById(@Parameter(description = "Comment Id to be deleted") @PathVariable Long id){
+    public ResponseEntity<CommentResponseDto> deleteById(
+            @Parameter(description = "Comment Id to be deleted")
+            @PathVariable Long id
+    ){
         return commentService.findById(id)
             .map(record -> {
                 commentService.deleteById(id);

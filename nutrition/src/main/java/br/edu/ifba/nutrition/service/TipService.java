@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import br.edu.ifba.nutrition.domain.dto.request.TipRequestDto;
 import br.edu.ifba.nutrition.domain.dto.response.TipResponseWithoutCommentDto;
-import br.edu.ifba.nutrition.entity.Tip;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,10 +24,13 @@ public class TipService {
         return TipResponseWithoutCommentDto.toDto(tipRepository.save(dataEntity)) ;
     }
 
-    public Optional<List<TipResponseWithCommentDto>> find(String title, int page, int size){
-        Pageable pageable = PageRequest.of(page, size);
-        if(title == null) return Optional.of(TipResponseWithCommentDto.toListDto(tipRepository.findAll(pageable).toList()));
-        return Optional.of(TipResponseWithCommentDto.toListDto(tipRepository.findByTitleContains(title, pageable)));
+    public Optional<List<TipResponseWithCommentDto>> find(String title, Pageable pageable){
+        if(title == null){
+            var data = TipResponseWithCommentDto.toListDto(tipRepository.findAll(pageable).toList());
+            return Optional.of(data);
+        }
+        var data = TipResponseWithCommentDto.toListDto(tipRepository.findByTitleContains(title, pageable));
+        return Optional.of(data);
     }
 
     public Optional<TipResponseWithCommentDto> findById(Long id){

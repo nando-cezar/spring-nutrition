@@ -13,12 +13,11 @@ public record CommentResponseDto(Long id, LocalDateTime dateTime, String text, U
     }
 
     public static List<CommentResponseDto> toListDto(List<Comment> list) {
-        return list.stream().map(CommentResponseDto::new).collect(Collectors.toList());
+        return list.stream().map(CommentResponseDto::new).toList();
     }
 
     public static CommentResponseDto toDto(Comment data) {
         return new CommentResponseDto(data);
     }
 
-    public Comment toEntity() { return new Comment(id, dateTime, text, user.toEntity()); }
 }

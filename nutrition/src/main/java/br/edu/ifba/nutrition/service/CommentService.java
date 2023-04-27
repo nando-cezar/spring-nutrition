@@ -54,8 +54,8 @@ public class CommentService {
 
     private Optional<CommentResponseDto> persist(CommentRequestDto data, Comment dataEntity){
 
-        var userData = userRepository.findById(data.userId()).map(record -> record);
-        var tipData = tipRepository.findById(data.tipId()).map(record -> record);
+        var userData = userRepository.findById(data.userId());
+        var tipData = tipRepository.findById(data.tipId());
         
         if(userData.isPresent() && tipData.isPresent()){
             dataEntity.setUser(userData.get());

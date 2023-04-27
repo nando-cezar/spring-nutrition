@@ -5,6 +5,9 @@ import java.util.List;
 import br.edu.ifba.nutrition.domain.dto.request.TipRequestDto;
 import br.edu.ifba.nutrition.domain.dto.response.TipResponseWithoutCommentDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,6 +30,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping(path = "/tips")
@@ -62,9 +66,14 @@ public class TipController {
             )
         }
     )
-    public ResponseEntity<TipResponseWithoutCommentDto> save(@Parameter(description = "New tip body content to be created") @RequestBody TipRequestDto data){
-        var dataDto = tipService.save(data);
-        return ResponseEntity.status(HttpStatus.CREATED).body(dataDto);
+    public ResponseEntity<TipResponseWithoutCommentDto> save(
+            @Parameter(description = "New tip body content to be created")
+            @RequestBody TipRequestDto data,
+            UriComponentsBuilder builder){
+
+        var dataSaved = tipService.save(data);
+        var uri = builder.path("/tips/{id}").buildAndExpand(dataSaved.id()).toUri();
+        return ResponseEntity.created(uri).body(dataSaved);
     } 
 
     @GetMapping
@@ -93,8 +102,14 @@ public class TipController {
             )
         }
     )
-    public ResponseEntity<List<TipResponseWithCommentDto>> find(@Parameter(description = "Title for tip to be found (optional)") @RequestParam(required = false) String title, @RequestParam int page, @RequestParam int size){
-        var data = tipService.find(title, page, size).get();
+    public ResponseEntity<List<TipResponseWithCommentDto>> find(
+            @Parameter(description = "Title for tip to be found (optional)")
+            @RequestParam(required = false) String title,
+            @RequestParam(required = true, defaultValue = "0") int page,
+            @RequestParam(required = true, defaultValue = "10") int size
+    ){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "title"));
+        var data = tipService.find(title, pageable).get();
         var isEmpty = data.isEmpty();     
         return isEmpty ? 
             ResponseEntity.notFound().build() : 

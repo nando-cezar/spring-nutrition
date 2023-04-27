@@ -13,7 +13,7 @@ public record TipResponseWithCommentDto(Long id, String title, String photo, Str
     }
 
     public static List<TipResponseWithCommentDto> toListDto(List<Tip> list) {
-        return list.stream().map(TipResponseWithCommentDto::new).collect(Collectors.toList());
+        return list.stream().map(TipResponseWithCommentDto::new).toList();
     }
     
 }
